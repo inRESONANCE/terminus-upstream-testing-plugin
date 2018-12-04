@@ -21,8 +21,7 @@
         "deployment"
     ],
     "require": {
-        "php": ">=5.4",
-        "maknz/slack": "^1.7"
+        "php": ">=5.4"
     },
     "support": {
         "issues": "https://github.com/terminus-plugin-project/terminus-upstream-testing-plugin/issues"

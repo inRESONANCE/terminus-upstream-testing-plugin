@@ -6,7 +6,6 @@ use Pantheon\Terminus\Commands\TerminusCommand;
 use Pantheon\Terminus\Site\SiteAwareInterface;
 use Pantheon\Terminus\Site\SiteAwareTrait;
 use Pantheon\Terminus\Exceptions\TerminusException;
-use Maknz\Slack\Client;
 
 /**
  * Class TestUpstreamCommand
@@ -36,11 +35,6 @@ class TestUpstreamCommand extends TerminusCommand implements SiteAwareInterface
    * @option string $message Message to append to commits (optional)
    * @option string $username Username to reset user 1 to (optional)
    * @option string $password Password to reset user 1 to (optional)
-   * @option string $slack_url Slack URL to post to (optional)
-   * @option string $slack_channel Slack channel to post to (optional)
-   * @option string $slack_message Slack Message to post (optional) (Default: #general)
-   * @option string $slack_username Slack User to post as (optional)
-   * @option string $slack_icon Slack Icon to user for user (optional)
    * @option string $notify Execute specific script for notification (optional)
    * @option boolean $skipautocommit Skip autocommit any files currently uncommitted in SFTP (optional)
    *
@@ -60,11 +54,6 @@ class TestUpstreamCommand extends TerminusCommand implements SiteAwareInterface
     'rebuild' => false,
     'username' => null,
     'password' => null,
-    'slack_message' => null,
-    'slack_url' => null,
-    'slack_channel' => null,
-    'slack_username' => 'Pantheon',
-    'slack_icon' => ':computer:',
     'notify' => null,
     'skipautocommit' => false
     ])
@@ -220,24 +209,6 @@ class TestUpstreamCommand extends TerminusCommand implements SiteAwareInterface
         if (!is_null($options['username']) && !is_null($options['password'])) {
             $this->sendDrushCommand($env, "user-password \"{$options['username']}\" --password=\"{$options['password']}\"");
             $this->log()->notice('{env} updated user 1 password to {password}', ['env' => $env, 'password' => $options['password']]);
-        }
-
-        if (!is_null($options['slack_url'])) {
-            $client = new Client($options['slack_url'], [
-            'channel' => $options['slack_channel'],
-            'username' => $options['slack_username'],
-            'icon' => $options['slack_icon']
-            ]);
-
-            $url = $this->message("http://{env}-{site_id}.pantheonsite.io", ['env' => $env, 'site_id' => $site_id]);
-            $message = $options['slack_message'];
-            if (is_null($message)) {
-                  $message = "<{url}|{site_name} - {env}> Environment created with upstream tests";
-            }
-
-            $message = $this->message($message, ['env' => $env, 'site_id' => $site_id, 'site_name' => $site_name, 'url' => $url]);
-            $client->send($message);
-            $this->log()->notice('Message sent to slack channel: {url}: {channel}', ['url' => $options['slack_url'], 'channel' => $options['slack_channel']]);
         }
 
         if(!is_null($options['notify'])){
