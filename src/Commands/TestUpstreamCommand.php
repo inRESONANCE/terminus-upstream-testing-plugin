@@ -194,8 +194,6 @@ class TestUpstreamCommand extends TerminusCommand implements SiteAwareInterface
             $this->log()->notice($workflow->getMessage());
         }
 
-        $this->log()->notice('Rebuilding registry and system tables (with Drush)');
-        $this->sendDrushCommand($env, 'rr');
         $this->log()->notice('Running Drush Clear Cache All');
         $this->sendDrushCommand($env, 'cc all');
         $this->log()->notice('Running Drush Updatedb');
